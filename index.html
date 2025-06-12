@@ -122,11 +122,13 @@
             align-items: center;
             justify-content: center;
             border: 3px solid #5d4037;
-            gap: 2px;
+            gap: 4px;
         }
-         .order-bubble .emoji {
+        .order-bubble .emoji, .order-bubble .svg-icon {
             font-size: clamp(1rem, 5vw, 1.5rem);
-         }
+            height: 1em; /* Ensure SVG scales with font size */
+            width: 1em;
+        }
         .patience-bar-wrapper {
             display: flex;
             align-items: center;
@@ -205,6 +207,16 @@
             font-size: clamp(0.8rem, 4vw, 1.2rem);
             line-height: 1;
             position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+        /* CORREGIDO: CSS para que el SVG se vea en el plato */
+        .plate-item .svg-icon {
+            height: 1.8em;
+            width: 1.8em;
         }
         .game-overlay {
             position: absolute;
@@ -291,6 +303,23 @@
             border-radius: 4px;
             transition: width 0.1s linear;
         }
+        .flying-plate {
+            position: absolute;
+            background-color: #fafafa;
+            border: 4px solid #9e9e9e;
+            border-radius: 50%;
+            z-index: 200;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.55, 0.09, 0.68, 0.53);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .flying-plate .emoji, .flying-plate .svg-icon {
+            font-size: 1.2rem;
+            height: 1em;
+            width: 1em;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center h-screen">
@@ -368,7 +397,7 @@
     </div>
 
     <script>
-        const ALL_INGREDIENTS = ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🍊', '🥑', '🍅', '🍄', '🍍', '🥥', '🥝', '🥭', '🍑', '🍒', '🫐', '🍈', '🍐', '🥦', '🥒', '🧅'];
+        const ALL_INGREDIENTS = ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '�', '🥑', '🍅', '🍄', '🍍', '🥥', '🥝', '🥭', '🍑', '🍒', '🫐', '🍈', '🍐', '🥦', '🥒', '🧅'];
         
         function generateLevels() {
             const levels = [];
@@ -379,20 +408,15 @@
             for (let i = 1; i <= 100; i++) {
                 const level = {
                     level: i,
-                    goal: 0,
-                    time: 0,
-                    patience: 0,
-                    maxOrderSize: 0,
+                    goal: Math.floor(5 * Math.pow(1.04, i)),
+                    time: Math.max(45, Math.floor(120 * Math.pow(0.985, i))),
+                    patience: Math.max(50, Math.floor(100 * Math.pow(0.995, i))),
+                    maxOrderSize: Math.min(6, Math.floor(1 + i / 8)),
                     ingredients: [],
                     actions: [],
                     events: []
                 };
                 
-                level.goal = Math.floor(5 * Math.pow(1.04, i));
-                level.time = Math.max(45, Math.floor(120 * Math.pow(0.985, i)));
-                level.patience = Math.max(50, Math.floor(100 * Math.pow(0.995, i)));
-                level.maxOrderSize = Math.min(6, Math.floor(1 + i / 8));
-
                 if (i === 5) availableActions.push('chop');
                 if (i === 10) availableActions.push('juice');
                 if (i > 2 && i % 4 === 0 && ALL_INGREDIENTS.length > currentIngredients.length) {
@@ -411,6 +435,12 @@
             return levels;
         }
 
+        const PROCESSED_INGREDIENTS = { '🥬': 'salad_svg', '🍊': '🧃' };
+        // CORREGIDO: Nuevo SVG para la ensalada
+        const SVG_ICONS = {
+            'salad_svg': `<svg class="svg-icon" viewBox="0 0 64 64"><path fill="#A3E635" d="M56,32c0,11-9,20-20,20S16,43,16,32c0-2.3,0.4-4.5,1.1-6.6l-8.4-8.4C2.9,20.2,0,25.9,0,32c0,17.7,14.3,32,32,32s32-14.3,32-32c0-6.1-1.7-11.8-4.7-16.9l-8.4,8.4C55.6,27.5,56,29.7,56,32z"/><path fill="#84CC16" d="M50,16c-3.2-3.2-7.4-5-12-5c-4.6,0-8.8,1.8-12,5c-3.2,3.2-5,7.4-5,12c0,4.6,1.8,8.8,5,12c3.2,3.2,7.4,5,12,5s8.8-1.8,12-5c3.2-3.2,5-7.4,5-12C55,23.4,53.2,19.2,50,16z"/><path fill="#DC2626" d="M30,22c-3.3,0-6,2.7-6,6s2.7,6,6,6s6-2.7,6-6S33.3,22,30,22z"/></svg>`
+        };
+        
         const LEVELS = generateLevels();
         const CUSTOMERS = ['🐰', '🦊', '🐻', '🐼', '🐨'];
         const VIP_CUSTOMER = '👑';
@@ -421,7 +451,6 @@
         const MAX_INGREDIENTS_PER_PLATE = 5;
         const VIP_REWARD = 50;
         const PROCESS_TIME = 2000;
-        const PROCESSED_INGREDIENTS = { '🥬': '�', '🍊': '🧃' };
         const STREAK_BONUS_THRESHOLD = 3;
         const STREAK_DURATION = 5000;
 
@@ -453,7 +482,6 @@
         const upgradeTimeCostEl = document.getElementById('upgrade-time-cost');
         const upgradePatienceCostEl = document.getElementById('upgrade-patience-cost');
         const bottomStations = document.getElementById('bottom-stations');
-        // CORREGIDO: Declaración de las variables de racha
         const streakDisplay = document.getElementById('streak-display');
         const streakCounterEl = document.getElementById('streak-counter');
         const streakTimerBar = document.getElementById('streak-timer-bar');
@@ -495,7 +523,7 @@
         function gameLoop() { timeLeft--; updateUI(); updatePatience(); if (isRushHourActive) { rushHourTimer--; if (rushHourTimer <= 0) endRushHour(); } else if (!vipHasSpawnedThisLevel) { const levelData = LEVELS[currentLevelIndex]; if (levelData.events.includes('Hora Pico') && timeLeft > 15 && timeLeft < levelData.time - 20) { if (Math.random() < 0.1) startRushHour(); } if (levelData.events.includes('VIP') && timeLeft > 20 && timeLeft < levelData.time - 15) { if (Math.random() < 0.05) startVipEvent(); } } if (timeLeft <= 0) showEndGame(false); }
         function showEndGame(didWinGame) { clearInterval(gameInterval); resetStreak(); if (didWinGame) { transitionTitle.textContent = "¡Felicidades!"; transitionText.textContent = `¡Has completado todos los niveles! Puntuación Final: ${totalCoins}`; coinsEarnedText.innerHTML = ""; nextLevelBtn.textContent = "Jugar de Nuevo"; soundManager.playLevelUp(); currentLevelIndex = -1; } else { transitionTitle.textContent = "¡Se acabó el tiempo!"; transitionText.textContent = `Nivel ${currentLevelIndex + 1} no superado.`; coinsEarnedText.innerHTML = ""; nextLevelBtn.textContent = "Reintentar Nivel"; soundManager.playGameOver(); } shopBtn.classList.add('hidden'); levelTransitionScreen.classList.remove('hidden'); }
         function completeLevel() { clearInterval(gameInterval); const coinsEarned = levelScore; totalCoins += coinsEarned; soundManager.playLevelUp(); oneTimeBonuses = { time: 0, patience: 0 }; resetStreak(); transitionTitle.textContent = `¡Nivel ${currentLevelIndex + 1} Superado!`; transitionText.textContent = "¡Buen trabajo!"; coinsEarnedText.innerHTML = `Has ganado ${coinsEarned} <svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#facc15"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#a16207">C</text></svg>`; nextLevelBtn.textContent = "Siguiente Nivel"; shopBtn.classList.remove('hidden'); levelTransitionScreen.classList.remove('hidden'); }
-        function serveActivePlate() { if (plates[activePlateIndex].isProcessing) return; soundManager.playClick(); const plateToServe = plates[activePlateIndex].ingredients; if (plateToServe.length === 0) { handleIncorrectOrder(); return; } const customer = activeCustomers[activePlateIndex]; if (customer && arraysMatch(plateToServe, customer.order)) { let pointsGained = customer.isVip ? 0 : 1; if (!customer.isVip && customer.order.includes(SPECIAL_INGREDIENT)) pointsGained = 2; streakCounter++; let bonusCoins = 0; if (streakCounter > 0 && streakCounter % STREAK_BONUS_THRESHOLD === 0) { bonusCoins = 5; totalCoins += bonusCoins; soundManager.playStreak(); } levelScore += pointsGained; let coinsGained = customer.isVip ? VIP_REWARD : 0; totalCoins += coinsGained; soundManager.playSuccess(); if(customer.isVip) soundManager.playCoin(); animatePlateDelivery(activePlateIndex, plateToServe, pointsGained + bonusCoins, customer.isVip, bonusCoins > 0); clearActivePlate(); startStreakTimer(); } else { handleIncorrectOrder(); } }
+        function serveActivePlate() { if (plates[activePlateIndex].isProcessing) return; soundManager.playClick(); const plateToServe = plates[activePlateIndex].ingredients; if (plateToServe.length === 0) { handleIncorrectOrder(); return; } const customer = activeCustomers[activePlateIndex]; if (customer && arraysMatch(plateToServe, customer.order)) { let pointsGained = customer.isVip ? 0 : 1; if (!customer.isVip && customer.order.includes(SPECIAL_INGREDIENT)) pointsGained = 2; streakCounter++; let bonusCoins = 0; if (streakCounter > 0 && streakCounter % STREAK_BONUS_THRESHOLD === 0) { bonusCoins = 5; totalCoins += bonusCoins; soundManager.playStreak(); } levelScore += pointsGained; let coinsGained = customer.isVip ? VIP_REWARD : 0; totalCoins += coinsGained; soundManager.playSuccess(); if(customer.isVip) soundManager.playCoin(); animatePlateDelivery(activePlateIndex, plateToServe, pointsGained, customer.isVip, bonusCoins); clearActivePlate(); startStreakTimer(); } else { handleIncorrectOrder(); } }
         function handleIncorrectOrder() { soundManager.playError(); resetStreak(); timeLeft -= 5; timerEl.parentElement.classList.add('time-penalty'); setTimeout(() => { timerEl.parentElement.classList.remove('time-penalty'); }, 500); const customer = activeCustomers[activePlateIndex]; if (customer) { customer.patience -= 15; const patienceBarWrapper = document.querySelector(`#customer-${activePlateIndex} .patience-bar-wrapper`); if (patienceBarWrapper) { patienceBarWrapper.classList.add('animate-shake'); setTimeout(() => { patienceBarWrapper.classList.remove('animate-shake'); }, 500); } } const plateEl = document.getElementById(`plate-${activePlateIndex}`); if (plateEl) { plateEl.classList.add('animate-shake'); setTimeout(() => { clearActivePlate(); }, 500); } else { clearActivePlate(); } }
         function removeCustomer(index, wasServed, pointsOrCoins = 0, isVip = false, bonusCoins = 0) { const customerEl = document.getElementById(`customer-${index}`); if (wasServed && customerEl) { showFloatingScore(customerEl, pointsOrCoins, isVip, bonusCoins); } if(customerEl) customerEl.remove(); if (activeCustomers[index]?.isVip) vipHasSpawnedThisLevel = true; activeCustomers[index] = null; if(wasServed) updateUI(); else { resetStreak(); } if (levelScore >= LEVELS[currentLevelIndex].goal) { completeLevel(); return; } const spawnDelay = isRushHourActive ? 500 : 1500; setTimeout(tryToSpawnCustomer, spawnDelay); }
         function updateUI() { levelScoreEl.textContent = levelScore; totalCoinsEl.textContent = totalCoins; timerEl.textContent = Math.ceil(timeLeft); levelDisplayEl.textContent = LEVELS[currentLevelIndex].level; goalDisplayEl.textContent = LEVELS[currentLevelIndex].goal; if (streakCounter >= 2) { streakDisplay.classList.remove('hidden'); streakCounterEl.textContent = streakCounter; } else { streakDisplay.classList.add('hidden'); } }
@@ -505,6 +533,10 @@
         function buyUpgrade(type) { soundManager.playClick(); const cost = 20; if (totalCoins >= cost) { totalCoins -= cost; if (type === 'time') oneTimeBonuses.time += 5; if (type === 'patience') oneTimeBonuses.patience += 10; soundManager.playCoin(); updateShopUI(); updateUI(); } }
         function spawnInitialCustomers() { for (let i = 0; i < MAX_CUSTOMERS; i++) { tryToSpawnCustomer(); } }
         function tryToSpawnCustomer() { const emptySlotIndex = activeCustomers.findIndex(c => c === null); if (emptySlotIndex !== -1) { spawnCustomer(emptySlotIndex); } }
+        
+        function getIngredientHTML(item) {
+            return SVG_ICONS[item] || `<div class="emoji">${item}</div>`;
+        }
         
         function spawnCustomer(slotIndex, isVip = false) {
             if (activeCustomers[slotIndex] !== null) return;
@@ -524,7 +556,7 @@
             } else {
                 animal = CUSTOMERS[Math.floor(Math.random() * CUSTOMERS.length)];
                 let ingredientsPool = [...levelData.ingredients];
-                if (levelData.actions.includes('chop')) ingredientsPool.push('🥗');
+                if (levelData.actions.includes('chop')) ingredientsPool.push('salad_svg');
                 if (levelData.actions.includes('juice')) ingredientsPool.push('🧃');
                 
                 const orderSize = Math.floor(Math.random() * levelData.maxOrderSize) + 1;
@@ -541,7 +573,7 @@
             customerDiv.className = isVip ? 'customer vip' : 'customer';
             customerDiv.id = `customer-${slotIndex}`;
             customerDiv.style.left = `${SLOT_POSITIONS[slotIndex]}%`;
-            let orderHTML = order.map(item => `<div class="emoji">${item}</div>`).join('');
+            let orderHTML = order.map(getIngredientHTML).join('');
             customerDiv.innerHTML = `
                 <div class="customer-display">
                     <div class="customer-head">
@@ -570,12 +602,11 @@
         function addIngredient(item) { if (plates[activePlateIndex].isProcessing) return; const ingredientEl = document.querySelector(`.ingredient[data-ingredient="${item}"]`); if (!ingredientEl || !ingredientEl.classList.contains('available')) return; if (plates[activePlateIndex].ingredients.length >= MAX_INGREDIENTS_PER_PLATE) return; soundManager.playClick(); plates[activePlateIndex].ingredients.push(item); renderAllPlates(); }
         function clearActivePlate() { if (plates[activePlateIndex].isProcessing) return; if (plates[activePlateIndex].ingredients.length > 0) { soundManager.playTrash(); } plates[activePlateIndex].ingredients = []; renderAllPlates(); }
         function selectPlate(index) { if (plates[index].isProcessing) return; soundManager.playClick(); activePlateIndex = index; renderAllPlates(); }
-        function renderAllPlates() { plateArea.innerHTML = ''; for (let i = 0; i < NUM_PLATES; i++) { const plateData = plates[i]; const plateEl = document.createElement('div'); plateEl.className = 'plate'; plateEl.id = `plate-${i}`; if (i === activePlateIndex) plateEl.classList.add('active'); if (plateData.isProcessing) plateEl.classList.add('processing'); plateData.ingredients.forEach((item) => { const itemSpan = document.createElement('span'); itemSpan.className = 'plate-item'; itemSpan.textContent = item; itemSpan.style.top = `${Math.random() * 40 + 10}%`; itemSpan.style.left = `${Math.random() * 60 + 15}%`; plateEl.appendChild(itemSpan); }); plateEl.addEventListener('click', () => selectPlate(i)); plateArea.appendChild(plateEl); } updateActionButtons(); }
+        function renderAllPlates() { plateArea.innerHTML = ''; for (let i = 0; i < NUM_PLATES; i++) { const plateData = plates[i]; const plateEl = document.createElement('div'); plateEl.className = 'plate'; plateEl.id = `plate-${i}`; if (i === activePlateIndex) plateEl.classList.add('active'); if (plateData.isProcessing) plateEl.classList.add('processing'); plateData.ingredients.forEach((item) => { const itemSpan = document.createElement('span'); itemSpan.className = 'plate-item'; itemSpan.innerHTML = getIngredientHTML(item); itemSpan.style.top = `${Math.random() * 20 + 40}%`; itemSpan.style.left = `${Math.random() * 20 + 40}%`; itemSpan.style.transform = 'translate(-50%, -50%)'; plateEl.appendChild(itemSpan); }); plateEl.addEventListener('click', () => selectPlate(i)); plateArea.appendChild(plateEl); } updateActionButtons(); }
         
         function updateAvailableIngredients() {
             bottomStations.innerHTML = '';
             const levelData = LEVELS[currentLevelIndex];
-            const availableItems = [...levelData.ingredients, ...levelData.actions];
             const allPossibleItems = [...ALL_INGREDIENTS, 'chop', 'juice'];
             
             allPossibleItems.forEach(item => {
@@ -594,7 +625,8 @@
                     el.addEventListener('click', () => addIngredient(item));
                 }
 
-                if (availableItems.includes(item)) {
+                const isAvailable = isAction ? levelData.actions.includes(item) : levelData.ingredients.includes(item);
+                if (isAvailable) {
                     el.classList.add('available');
                 } else {
                     el.classList.add('hidden'); // Hide if not in level
@@ -673,8 +705,79 @@
             }, PROCESS_TIME / 10);
         }
 
-        function animatePlateDelivery(customerIndex, plateContent, pointsGained, isVip) { const plateEl = document.getElementById(`plate-${customerIndex}`); const customerEl = document.getElementById(`customer-${customerIndex}`); const containerRect = gameContainer.getBoundingClientRect(); if (!plateEl || !customerEl) return; const startRect = plateEl.getBoundingClientRect(); const endRect = customerEl.getBoundingClientRect(); const flyingPlate = document.createElement('div'); flyingPlate.className = 'flying-plate'; flyingPlate.innerHTML = plateContent.map(item => `<span class="plate-item">${PROCESSED_INGREDIENTS[item] || item}</span>`).join(''); const startX = startRect.left - containerRect.left + (startRect.width / 2) - 40; const startY = startRect.top - containerRect.top + (startRect.height / 2) - 20; const endX = endRect.left - containerRect.left + (endRect.width / 2) - 40; const endY = endRect.top - containerRect.top; flyingPlate.style.left = `${startX}px`; flyingPlate.style.top = `${startY}px`; gameContainer.appendChild(flyingPlate); requestAnimationFrame(() => { flyingPlate.style.left = `${endX}px`; flyingPlate.style.top = `${endY}px`; flyingPlate.style.transform = 'scale(0.5)'; flyingPlate.style.opacity = '0'; }); setTimeout(() => { if(gameContainer.contains(flyingPlate)) { gameContainer.removeChild(flyingPlate); } removeCustomer(customerIndex, true, pointsGained, isVip); }, 500); }
-        function showFloatingScore(customerEl, pointsOrCoins, isVip, bonusCoins) { if (!customerEl) return; const containerRect = gameContainer.getBoundingClientRect(); const customerRect = customerEl.getBoundingClientRect(); const scoreText = document.createElement('div'); scoreText.className = 'floating-score'; let content = ''; if(isVip) { content = `+${VIP_REWARD} <svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#facc15"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#a16207">C</text></svg>`; } else { content = `+${pointsOrCoins}`; } if (bonusCoins > 0) { content += ` +${bonusCoins} <svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#facc15"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#a16207">C</text></svg>`; } scoreText.innerHTML = content; const x = customerRect.left - containerRect.left + (customerRect.width / 2) - 15; const y = customerRect.top - containerRect.top; scoreText.style.left = `${x}px`; scoreText.style.top = `${y}px`; gameContainer.appendChild(scoreText); setTimeout(() => { if(gameContainer.contains(scoreText)) { gameContainer.removeChild(scoreText); } }, 1500); }
+        function animatePlateDelivery(customerIndex, plateContent, pointsGained, isVip, bonusCoins) {
+            const plateEl = document.getElementById(`plate-${customerIndex}`);
+            const customerEl = document.getElementById(`customer-${customerIndex}`);
+            const containerRect = gameContainer.getBoundingClientRect();
+            
+            if (!plateEl || !customerEl) return;
+            
+            const startRect = plateEl.getBoundingClientRect();
+            const endRect = customerEl.getBoundingClientRect();
+            
+            const flyingPlate = document.createElement('div');
+            flyingPlate.className = 'flying-plate';
+            flyingPlate.innerHTML = plateContent.map(getIngredientHTML).join('');
+            
+            const startX = startRect.left - containerRect.left;
+            const startY = startRect.top - containerRect.top;
+            
+            const endX = endRect.left - containerRect.left + (endRect.width / 2) - (startRect.width / 2);
+            const endY = endRect.top - containerRect.top;
+
+            flyingPlate.style.left = `${startX}px`;
+            flyingPlate.style.top = `${startY}px`;
+            flyingPlate.style.width = `${startRect.width}px`;
+            flyingPlate.style.height = `${startRect.height}px`;
+
+            gameContainer.appendChild(flyingPlate);
+
+            requestAnimationFrame(() => {
+                flyingPlate.style.left = `${endX}px`;
+                flyingPlate.style.top = `${endY}px`;
+                flyingPlate.style.transform = 'scale(0.3)';
+                flyingPlate.style.opacity = '0';
+            });
+
+            setTimeout(() => {
+                if(gameContainer.contains(flyingPlate)) {
+                    gameContainer.removeChild(flyingPlate);
+                }
+                removeCustomer(customerIndex, true, pointsGained, isVip, bonusCoins);
+            }, 500);
+        }
+        
+        function showFloatingScore(customerEl, pointsOrCoins, isVip, bonusCoins) {
+            if (!customerEl) return;
+            const containerRect = gameContainer.getBoundingClientRect();
+            const customerRect = customerEl.getBoundingClientRect();
+            const scoreText = document.createElement('div');
+            scoreText.className = 'floating-score';
+            let content = '';
+            
+            if (isVip) {
+                content = `+${VIP_REWARD} <svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#facc15"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#a16207">C</text></svg>`;
+            } else {
+                content = `+${pointsOrCoins}`;
+            }
+            
+            if (bonusCoins > 0) {
+                content += ` <span class="text-orange-400">+${bonusCoins} 🔥</span>`;
+            }
+            
+            scoreText.innerHTML = content;
+            const x = customerRect.left - containerRect.left + (customerRect.width / 2) - 15;
+            const y = customerRect.top - containerRect.top;
+            scoreText.style.left = `${x}px`;
+            scoreText.style.top = `${y}px`;
+            gameContainer.appendChild(scoreText);
+            setTimeout(() => {
+                if(gameContainer.contains(scoreText)) {
+                    gameContainer.removeChild(scoreText);
+                }
+            }, 1500);
+        }
+        
         function startVipEvent() { if (vipHasSpawnedThisLevel) return; const emptySlot = activeCustomers.findIndex(c => c === null); if (emptySlot === -1) return; vipHasSpawnedThisLevel = true; showEventMessage("¡CLIENTE VIP!"); soundManager.playVip(); spawnCustomer(emptySlot, true); }
         function resetStreak() { clearInterval(streakInterval); streakInterval = null; streakCounter = 0; streakTimer = STREAK_DURATION; updateUI(); }
         function startStreakTimer() { streakTimer = STREAK_DURATION; if (!streakInterval) { streakInterval = setInterval(streakLoop, 100); } }
