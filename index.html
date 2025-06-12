@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Café Carpincho</title>
+    <title>Café Carpincho - Vertical</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Librería Tone.js para los efectos de sonido -->
@@ -22,12 +22,13 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
+            padding: 0.5rem;
         }
         .game-container {
             width: 100%;
-            max-width: 800px;
-            aspect-ratio: 4 / 3; 
+            max-width: 450px; /* Ancho típico de móvil */
+            aspect-ratio: 9 / 16; /* Proporción de pantalla vertical */
+            max-height: 95vh;
             background-color: #a98d71;
             background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
             border: 10px solid #5d4037;
@@ -40,20 +41,29 @@
         .top-bar {
             background-color: #a1887f;
             color: white;
-            padding: 0.25rem 1rem;
+            padding: 0.25rem 0.5rem;
             font-family: 'Fredoka One', cursive;
-            font-size: clamp(0.75rem, 2.5vw, 1.25rem);
+            font-size: clamp(0.7rem, 3vw, 1rem); /* Tamaño de fuente ajustado */
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
-            gap: 0.5rem;
+            gap: 0.25rem;
         }
         .counter-top {
             background-color: #d7ccc8;
             border-bottom: 8px solid #a1887f;
-            flex-grow: 1;
             position: relative;
+            flex: 3; /* Más espacio para los clientes */
+        }
+        .ingredient-station {
+            background-color: #eceff1;
+            border-top: 8px solid #a1887f;
+            position: relative;
+            padding: 0.5rem;
+            flex: 2; /* Menos espacio, más compacto */
+            display: flex;
+            flex-direction: column;
         }
         .customer-area {
             position: absolute;
@@ -64,8 +74,8 @@
         .customer {
             position: absolute;
             bottom: 1%;
-            width: 20%;
-            max-width: 120px;
+            width: 25%; /* Ligeramente más grandes en proporción */
+            max-width: 90px;
             transition: transform 0.5s ease-out, opacity 0.5s ease-out;
             transform: translateX(-50%) translateY(150px);
             opacity: 0;
@@ -82,12 +92,12 @@
             align-items: center;
         }
         .customer-emoji {
-            font-size: clamp(50px, 10vw, 80px);
+            font-size: clamp(40px, 15vw, 70px);
             text-align: center;
             line-height: 1;
         }
         .customer.vip .customer-emoji {
-            font-size: clamp(60px, 11vw, 90px) !important;
+            font-size: clamp(50px, 16vw, 80px) !important;
         }
         .customer-head {
             position: absolute;
@@ -95,7 +105,7 @@
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
-            min-height: 90px;
+            min-height: 70px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -103,18 +113,18 @@
         }
         .order-bubble {
             background-color: white;
-            border-radius: 30px; /* Pill shape */
-            padding: 8px 12px;
-            min-width: 70px;
-            height: 70px;
+            border-radius: 20px;
+            padding: 4px 8px;
+            min-width: 50px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 4px solid #5d4037;
-            gap: 4px;
+            border: 3px solid #5d4037;
+            gap: 2px;
         }
          .order-bubble .emoji {
-            font-size: clamp(1.2rem, 4vw, 2.5rem);
+            font-size: clamp(1rem, 5vw, 1.5rem);
          }
         .patience-bar-wrapper {
             display: flex;
@@ -136,12 +146,6 @@
             background-color: #4ade80;
             border-radius: 3px;
             transition: width 0.5s linear, background-color 0.5s ease;
-        }
-        .ingredient-station {
-            background-color: #eceff1;
-            border-top: 8px solid #a1887f;
-            position: relative;
-            padding: 0.5rem;
         }
         .ingredient, .action-station {
             cursor: pointer;
@@ -168,19 +172,21 @@
              transform: scale(0.95);
         }
         .ingredient-icon, .action-icon {
-            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-size: clamp(1.8rem, 8vw, 2.5rem);
             line-height: 1;
         }
+        /* MODIFICADO: Platos en fila horizontal */
         .plate-area {
             display: flex;
+            flex-direction: row; /* Horizontal */
             justify-content: space-around;
             align-items: center;
-            padding: 0.5rem 0;
+            gap: 0.5rem;
             flex-grow: 1;
         }
         .plate {
-            width: 28%;
-            height: 70%;
+            width: 30%; /* Ancho ajustado para fila */
+            height: 65%; /* Alto ajustado para mantener forma circular */
             background-color: #fafafa;
             border: 4px solid #9e9e9e;
             border-radius: 50%;
@@ -196,7 +202,7 @@
             cursor: not-allowed;
         }
         .plate-item {
-            font-size: clamp(0.8rem, 2.5vw, 1.5rem);
+            font-size: clamp(0.8rem, 4vw, 1.2rem);
             line-height: 1;
             position: absolute;
         }
@@ -220,7 +226,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             font-family: 'Fredoka One', cursive;
-            font-size: 3rem;
+            font-size: clamp(2rem, 10vw, 3rem);
             color: #f59e0b;
             text-shadow: 3px 3px #000;
             animation: pulse-and-fade 2s ease-out forwards;
@@ -242,10 +248,10 @@
             30%, 50%, 70% { transform: translateX(-4px); }
             40%, 60% { transform: translateX(4px); }
         }
-        .floating-score { position: absolute; font-family: 'Fredoka One', cursive; color: #fdd835; font-size: 2rem; animation: float-up 1s ease-out forwards; pointer-events: none; z-index: 51; text-shadow: 2px 2px #000; }
+        .floating-score { position: absolute; font-family: 'Fredoka One', cursive; color: #fdd835; font-size: 1.5rem; animation: float-up 1s ease-out forwards; pointer-events: none; z-index: 51; text-shadow: 2px 2px #000; }
         @keyframes float-up { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-50px); opacity: 0; } }
         .hidden { display: none; }
-        .upgrade-card { background-color: #4b5563; border: 2px solid #9ca3af; border-radius: 1rem; padding: 1rem; width: 200px; display: flex; flex-direction: column; align-items: center; }
+        .upgrade-card { background-color: #4b5563; border: 2px solid #9ca3af; border-radius: 1rem; padding: 1rem; width: 180px; display: flex; flex-direction: column; align-items: center; }
         .upgrade-card:disabled { opacity: 0.5; cursor: not-allowed; }
         .upgrade-icon { font-size: 1.25rem; margin-left: 0.5rem; }
         .upgrade-icon-patience { font-size: 1.25rem; }
@@ -290,32 +296,33 @@
 <body class="flex items-center justify-center h-screen">
 
     <div class="game-wrapper">
-        <h1 class="text-2xl md:text-4xl font-bold text-[#5d4037] mb-4" style="font-family: 'Fredoka One', cursive;">Café Carpincho</h1>
+        <h1 class="text-2xl md:text-3xl font-bold text-[#5d4037] mb-2" style="font-family: 'Fredoka One', cursive;">Café Carpincho</h1>
 
         <div id="game-container" class="game-container">
             <!-- PANTALLA DE INICIO -->
             <div id="start-screen" class="game-overlay">
-                <h2 class="text-4xl md:text-6xl mb-4" style="font-family: 'Fredoka One', cursive;">Café Carpincho</h2>
-                <p class="text-lg md:text-xl mb-8">¡Atiende a tus amigos animales lo más rápido que puedas!</p>
-                <button id="start-game-btn" class="bg-yellow-500 text-gray-800 font-bold py-3 px-8 rounded-lg text-xl">Empezar a Jugar</button>
+                <h2 class="text-3xl md:text-4xl mb-4" style="font-family: 'Fredoka One', cursive;">Café Carpincho</h2>
+                <p class="text-md md:text-lg mb-8">¡Atiende a tus amigos animales lo más rápido que puedas!</p>
+                <button id="start-game-btn" class="bg-yellow-500 text-gray-800 font-bold py-3 px-8 rounded-lg text-lg">Empezar a Jugar</button>
             </div>
 
             <!-- PANTALLA DE SUPERAR NIVEL / FIN DE JUEGO -->
             <div id="level-transition-screen" class="game-overlay hidden">
-                <h2 id="transition-title" class="text-3xl md:text-5xl mb-4" style="font-family: 'Fredoka One', cursive;"></h2>
-                <p id="transition-text" class="text-xl md:text-2xl mb-2"></p>
-                <p id="coins-earned-text" class="text-lg md:text-xl text-yellow-400 mb-6 flex items-center justify-center"></p>
-                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                    <button id="shop-btn" class="bg-blue-500 text-white font-bold py-3 px-8 rounded-lg text-xl">Tienda</button>
-                    <button id="next-level-btn" class="bg-yellow-500 text-gray-800 font-bold py-3 px-8 rounded-lg text-xl"></button>
+                <h2 id="transition-title" class="text-3xl mb-4" style="font-family: 'Fredoka One', cursive;"></h2>
+                <p id="transition-text" class="text-lg mb-2"></p>
+                <p id="coins-earned-text" class="text-md text-yellow-400 mb-6 flex items-center justify-center"></p>
+                <div class="flex flex-col space-y-4">
+                    <button id="shop-btn" class="bg-blue-500 text-white font-bold py-3 px-8 rounded-lg text-lg">Tienda</button>
+                    <button id="next-level-btn" class="bg-yellow-500 text-gray-800 font-bold py-3 px-8 rounded-lg text-lg"></button>
                 </div>
             </div>
             
             <!-- TIENDA DE MEJORAS -->
             <div id="shop-screen" class="game-overlay hidden">
-                 <h2 class="text-3xl md:text-5xl mb-4" style="font-family: 'Fredoka One', cursive;">Tienda</h2>
+                 <h2 class="text-3xl mb-4" style="font-family: 'Fredoka One', cursive;">Tienda</h2>
                 <div class="mb-6 flex items-center">Monedas: <span id="shop-coins-display" class="font-bold text-yellow-400 ml-2">0</span> <svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#facc15"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#a16207">C</text></svg></div>
-                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+                <!-- MODIFICADO: Tienda siempre en columna -->
+                <div class="flex flex-col space-y-4 mb-8">
                     <button id="upgrade-time-btn" class="upgrade-card">
                         <div class="text-4xl mb-2">⏱️</div>
                         <p class="font-bold">Zapatillas Rápidas</p>
@@ -329,7 +336,7 @@
                         <p class="text-lg flex items-center">Coste: <span id="upgrade-patience-cost">20</span><svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#facc15"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#a16207">C</text></svg></p>
                     </button>
                 </div>
-                <button id="close-shop-btn" class="bg-gray-500 text-white font-bold py-3 px-8 rounded-lg text-xl">Volver</button>
+                <button id="close-shop-btn" class="bg-gray-500 text-white font-bold py-3 px-8 rounded-lg text-lg">Volver</button>
             </div>
 
             <!-- CONTENIDO DEL JUEGO (inicialmente oculto) -->
@@ -340,32 +347,32 @@
                     <div id="streak-display" class="streak-display hidden">
                         <span>🔥x<span id="streak-counter">0</span></span>
                         <div class="streak-timer-container">
-                            <div id="streak-timer-bar" class="streak-timer-bar"></div>
+                           <div id="streak-timer-bar" class="streak-timer-bar"></div>
                         </div>
                     </div>
                     <div class="flex items-center"><span id="total-coins-display">0</span><svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#facc15"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#a16207">C</text></svg></div>
-                    <div class="flex items-center">Tiempo: <span id="timer">90</span><span id="time-upgrade-icon" class="upgrade-icon hidden">⏱️</span></div>
+                    <div class="flex items-center">T: <span id="timer">90</span><span id="time-upgrade-icon" class="upgrade-icon hidden">⏱️</span></div>
                 </div>
 
                 <div class="counter-top p-4">
                     <div id="customer-area" class="customer-area"></div>
                 </div>
 
-                <div class="ingredient-station p-2 sm:p-4 flex-grow flex flex-col">
-                    <div id="plate-area" class="plate-area mb-3"></div>
-                    <div id="bottom-stations" class="grid grid-cols-9 gap-1 sm:gap-2 mb-3">
+                <div class="ingredient-station">
+                    <div id="plate-area" class="plate-area mb-2"></div>
+                    <div id="bottom-stations" class="grid grid-cols-5 gap-1 mb-2">
                         <div class="ingredient" data-ingredient="🍓"><div class="ingredient-icon">🍓</div></div>
-                        <div class="ingredient" data-ingredient="🥬"><div class="ingredient-icon">🥬</div></div>
+                        <div class="ingredient" data-ingredient="�"><div class="ingredient-icon">🥬</div></div>
                         <div class="ingredient" data-ingredient="🥕"><div class="ingredient-icon">🥕</div></div>
                         <div class="ingredient" data-ingredient="🌽"><div class="ingredient-icon">🌽</div></div>
-                        <div class="ingredient" data-ingredient="🍉"><div class="ingredient-icon">🍉</div></div>
-                        <div class="ingredient special-ingredient" data-ingredient="🌶️"><div class="ingredient-icon">🌶️</div></div>
-                        <div class="ingredient" data-ingredient="🍊"><div class="ingredient-icon">🍊</div></div>
-                        <!-- CORREGIDO: data-action cambiado a string -->
                         <div id="chop-station" class="action-station" data-action="chop">
                             <div class="action-icon">🔪</div>
                             <div class="progress-bar-container"><div id="chop-progress" class="progress-bar"></div></div>
                         </div>
+                        <div class="ingredient" data-ingredient="🍉"><div class="ingredient-icon">🍉</div></div>
+                        <div class="ingredient special-ingredient" data-ingredient="🌶️"><div class="ingredient-icon">🌶️</div></div>
+                        <div class="ingredient" data-ingredient="🍊"><div class="ingredient-icon">🍊</div></div>
+                        <div></div> <!-- Espacio vacío -->
                         <div id="juice-station" class="action-station" data-action="juice">
                             <div class="action-icon">🧃</div>
                             <div class="progress-bar-container"><div id="juice-progress" class="progress-bar"></div></div>
@@ -381,8 +388,6 @@
     </div>
 
     <script>
-        // --- ESTRUCTURA DE NIVELES ---
-        // CORREGIDO: Se usan strings ('chop', 'juice') para las acciones en lugar de emojis.
         const LEVELS = [
             { level: 1, goal: 5, time: 100, patience: 100, maxOrderSize: 1, availableIngredients: ['🍓', '🥬', '🥕'] },
             { level: 2, goal: 7, time: 90, patience: 95, maxOrderSize: 2, availableIngredients: ['🍓', '🥬', '🥕', '🌽'], rushHourChance: 0.1, vipChance: 0.05 },
@@ -501,7 +506,6 @@
         function spawnInitialCustomers() { for (let i = 0; i < MAX_CUSTOMERS; i++) { tryToSpawnCustomer(); } }
         function tryToSpawnCustomer() { const emptySlotIndex = activeCustomers.findIndex(c => c === null); if (emptySlotIndex !== -1) { spawnCustomer(emptySlotIndex); } }
         
-        // CORREGIDO: Lógica de generación de pedidos de clientes
         function spawnCustomer(slotIndex, isVip = false) {
             if (activeCustomers[slotIndex] !== null) return;
             const levelData = LEVELS[currentLevelIndex];
@@ -523,7 +527,6 @@
                 order = [];
                 const orderSize = Math.floor(Math.random() * levelData.maxOrderSize) + 1;
                 
-                // Construir la lista de posibles ingredientes para pedir
                 const levelIngredients = levelData.availableIngredients;
                 let ingredientsPool = levelIngredients.filter(i => !['chop', 'juice'].includes(i));
                 if (levelIngredients.includes('chop')) {
@@ -580,10 +583,11 @@
         
         function updateAvailableIngredients() {
             const available = LEVELS[currentLevelIndex].availableIngredients;
-            document.querySelectorAll('#bottom-stations > div').forEach(el => {
-                const key = el.dataset.ingredient || el.dataset.action;
-                const isAvailable = available.includes(key);
-                el.classList.toggle('available', isAvailable);
+            document.querySelectorAll('#bottom-stations > div[data-ingredient]').forEach(el => {
+                el.classList.toggle('available', available.includes(el.dataset.ingredient));
+            });
+            document.querySelectorAll('#bottom-stations > div[data-action]').forEach(el => {
+                el.classList.toggle('available', available.includes(el.dataset.action));
             });
         }
 
@@ -591,15 +595,12 @@
         
         function updateActionButtons() {
             const currentPlate = plates[activePlateIndex];
-            
-            const canChop = currentPlate.ingredients.length === 1 && currentPlate.ingredients[0] === '�';
+            const canChop = currentPlate.ingredients.length === 1 && currentPlate.ingredients[0] === '🥬';
             chopStation.classList.toggle('usable', canChop);
-
             const canJuice = currentPlate.ingredients.length === 1 && currentPlate.ingredients[0] === '🍊';
             juiceStation.classList.toggle('usable', canJuice);
         }
         
-        // --- EVENT LISTENERS ---
         function setupEventListeners() {
             document.querySelectorAll('.ingredient').forEach(ing => {
                 ing.addEventListener('click', () => addIngredient(ing.dataset.ingredient));
@@ -661,9 +662,8 @@
         function startVipEvent() { if (vipHasSpawnedThisLevel) return; const emptySlot = activeCustomers.findIndex(c => c === null); if (emptySlot === -1) return; vipHasSpawnedThisLevel = true; showEventMessage("¡CLIENTE VIP!"); soundManager.playVip(); spawnCustomer(emptySlot, true); }
         function resetStreak() { clearInterval(streakInterval); streakInterval = null; streakCounter = 0; streakTimer = STREAK_DURATION; updateUI(); }
         function startStreakTimer() { streakTimer = STREAK_DURATION; if (!streakInterval) { streakInterval = setInterval(streakLoop, 100); } }
-        function streakLoop() { streakTimer -= 100; const percentage = (streakTimer / STREAK_DURATION) * 100; streakTimerBar.style.width = `${percentage}%`; if (streakTimer <= 0) { resetStreak(); } }
+        function streakLoop() { streakTimer -= 100; const percentage = (streakTimer / STREAK_DURATION) * 100; if (streakTimerBar) { streakTimerBar.style.width = `${percentage}%`; } if (streakTimer <= 0) { resetStreak(); } }
 
-        // Inicializar los event listeners cuando el script se carga
         setupEventListeners();
     </script>
 </body>
