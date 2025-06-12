@@ -116,8 +116,9 @@
             border-radius: 20px;
             padding: 4px 8px;
             min-width: 50px;
-            height: 50px;
+            min-height: 50px;
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: center;
             border: 3px solid #5d4037;
@@ -355,22 +356,7 @@
                 <div class="ingredient-station">
                     <div id="plate-area" class="plate-area mb-2"></div>
                     <div id="bottom-stations" class="grid grid-cols-5 gap-1 mb-2">
-                        <div class="ingredient" data-ingredient="🍓"><div class="ingredient-icon">🍓</div></div>
-                        <div class="ingredient" data-ingredient="🥬"><div class="ingredient-icon">🥬</div></div>
-                        <div class="ingredient" data-ingredient="🥕"><div class="ingredient-icon">🥕</div></div>
-                        <div class="ingredient" data-ingredient="🌽"><div class="ingredient-icon">🌽</div></div>
-                        <div id="chop-station" class="action-station" data-action="chop">
-                            <div class="action-icon">🔪</div>
-                            <div class="progress-bar-container"><div id="chop-progress" class="progress-bar"></div></div>
-                        </div>
-                        <div class="ingredient" data-ingredient="🍉"><div class="ingredient-icon">🍉</div></div>
-                        <div class="ingredient special-ingredient" data-ingredient="🌶️"><div class="ingredient-icon">🌶️</div></div>
-                        <div class="ingredient" data-ingredient="🍊"><div class="ingredient-icon">🍊</div></div>
-                        <div></div> 
-                        <div id="juice-station" class="action-station" data-action="juice">
-                            <div class="action-icon">🧃</div>
-                            <div class="progress-bar-container"><div id="juice-progress" class="progress-bar"></div></div>
-                        </div>
+                        <!-- Los ingredientes se generarán dinámicamente aquí -->
                     </div>
                     <div class="flex justify-center mt-auto space-x-4">
                         <button id="serve-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow-md">Servir</button>
@@ -382,17 +368,50 @@
     </div>
 
     <script>
-        const LEVELS = [
-            { level: 1, goal: 5, time: 100, patience: 100, maxOrderSize: 1, ingredients: ['🍓', '🥬', '🥕'], actions: [] },
-            { level: 2, goal: 7, time: 90, patience: 95, maxOrderSize: 2, ingredients: ['🍓', '🥬', '🥕', '🌽'], actions: [], rushHourChance: 0.1, vipChance: 0.05 },
-            { level: 3, goal: 10, time: 80, patience: 90, maxOrderSize: 2, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉'], actions: ['chop'], rushHourChance: 0.15, vipChance: 0.07 },
-            { level: 4, goal: 12, time: 75, patience: 85, maxOrderSize: 3, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️'], actions: ['chop'], rushHourChance: 0.2, vipChance: 0.08 },
-            { level: 5, goal: 15, time: 70, patience: 80, maxOrderSize: 3, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️'], actions: ['chop'], rushHourChance: 0.25, vipChance: 0.1 },
-            { level: 6, goal: 20, time: 65, patience: 75, maxOrderSize: 4, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️'], actions: ['chop'], rushHourChance: 0.3, vipChance: 0.12 },
-            { level: 7, goal: 22, time: 60, patience: 70, maxOrderSize: 4, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🍊'], actions: ['chop', 'juice'], rushHourChance: 0.35, vipChance: 0.15 },
-            { level: 8, goal: 25, time: 55, patience: 65, maxOrderSize: 5, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🍊'], actions: ['chop', 'juice'], rushHourChance: 0.4, vipChance: 0.2 }
-        ];
+        const ALL_INGREDIENTS = ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🍊', '🥑', '🍅', '🍄', '🍍', '🥥', '🥝', '🥭', '🍑', '🍒', '🫐', '🍈', '🍐', '🥦', '🥒', '🧅'];
+        
+        function generateLevels() {
+            const levels = [];
+            const baseIngredients = ['🍓', '🥬', '🥕'];
+            let currentIngredients = [...baseIngredients];
+            let availableActions = [];
 
+            for (let i = 1; i <= 100; i++) {
+                const level = {
+                    level: i,
+                    goal: 0,
+                    time: 0,
+                    patience: 0,
+                    maxOrderSize: 0,
+                    ingredients: [],
+                    actions: [],
+                    events: []
+                };
+                
+                level.goal = Math.floor(5 * Math.pow(1.04, i));
+                level.time = Math.max(45, Math.floor(120 * Math.pow(0.985, i)));
+                level.patience = Math.max(50, Math.floor(100 * Math.pow(0.995, i)));
+                level.maxOrderSize = Math.min(6, Math.floor(1 + i / 8));
+
+                if (i === 5) availableActions.push('chop');
+                if (i === 10) availableActions.push('juice');
+                if (i > 2 && i % 4 === 0 && ALL_INGREDIENTS.length > currentIngredients.length) {
+                     const newIngredient = ALL_INGREDIENTS[currentIngredients.length];
+                     if (newIngredient) currentIngredients.push(newIngredient);
+                }
+                
+                level.ingredients = [...currentIngredients];
+                level.actions = [...availableActions];
+
+                if (i > 3) level.events.push('VIP');
+                if (i > 6) level.events.push('Hora Pico');
+                
+                levels.push(level);
+            }
+            return levels;
+        }
+
+        const LEVELS = generateLevels();
         const CUSTOMERS = ['🐰', '🦊', '🐻', '🐼', '🐨'];
         const VIP_CUSTOMER = '👑';
         const SPECIAL_INGREDIENT = '🌶️';
@@ -402,7 +421,7 @@
         const MAX_INGREDIENTS_PER_PLATE = 5;
         const VIP_REWARD = 50;
         const PROCESS_TIME = 2000;
-        const PROCESSED_INGREDIENTS = { '🥬': '🥗', '🍊': '🧃' };
+        const PROCESSED_INGREDIENTS = { '🥬': '�', '🍊': '🧃' };
         const STREAK_BONUS_THRESHOLD = 3;
         const STREAK_DURATION = 5000;
 
@@ -433,10 +452,8 @@
         const upgradePatienceBtn = document.getElementById('upgrade-patience-btn');
         const upgradeTimeCostEl = document.getElementById('upgrade-time-cost');
         const upgradePatienceCostEl = document.getElementById('upgrade-patience-cost');
-        const chopStation = document.getElementById('chop-station');
-        const chopProgress = document.getElementById('chop-progress');
-        const juiceStation = document.getElementById('juice-station');
-        const juiceProgress = document.getElementById('juice-progress');
+        const bottomStations = document.getElementById('bottom-stations');
+        // CORREGIDO: Declaración de las variables de racha
         const streakDisplay = document.getElementById('streak-display');
         const streakCounterEl = document.getElementById('streak-counter');
         const streakTimerBar = document.getElementById('streak-timer-bar');
@@ -475,7 +492,7 @@
         
         function initializeGame() { totalCoins = 0; oneTimeBonuses = { time: 0, patience: 0 }; startLevel(0); }
         function startLevel(levelIndex) { if (levelIndex >= LEVELS.length) { showEndGame(true); return; } if (oneTimeBonuses.time > 0) { timeUpgradeIcon.classList.remove('hidden'); } else { timeUpgradeIcon.classList.add('hidden'); } const levelData = LEVELS[levelIndex]; currentLevelIndex = levelIndex; levelTransitionScreen.classList.add('hidden'); shopScreen.classList.add('hidden'); levelScore = 0; timeLeft = levelData.time + oneTimeBonuses.time; isRushHourActive = false; vipHasSpawnedThisLevel = false; resetStreak(); activeCustomers = new Array(MAX_CUSTOMERS).fill(null); plates = Array.from({ length: NUM_PLATES }, () => ({ ingredients: [], isProcessing: false })); activePlateIndex = 0; updateUI(); renderAllPlates(); updateAvailableIngredients(); customerArea.innerHTML = ''; spawnInitialCustomers(); if (gameInterval) clearInterval(gameInterval); gameInterval = setInterval(gameLoop, 1000); }
-        function gameLoop() { timeLeft--; updateUI(); updatePatience(); if (isRushHourActive) { rushHourTimer--; if (rushHourTimer <= 0) endRushHour(); } else if (!vipHasSpawnedThisLevel) { const levelData = LEVELS[currentLevelIndex]; if (levelData.rushHourChance && timeLeft > 15 && timeLeft < levelData.time - 20) { if (Math.random() < levelData.rushHourChance) startRushHour(); } if (levelData.vipChance && timeLeft > 20 && timeLeft < levelData.time - 15) { startVipEvent(); } } if (timeLeft <= 0) showEndGame(false); }
+        function gameLoop() { timeLeft--; updateUI(); updatePatience(); if (isRushHourActive) { rushHourTimer--; if (rushHourTimer <= 0) endRushHour(); } else if (!vipHasSpawnedThisLevel) { const levelData = LEVELS[currentLevelIndex]; if (levelData.events.includes('Hora Pico') && timeLeft > 15 && timeLeft < levelData.time - 20) { if (Math.random() < 0.1) startRushHour(); } if (levelData.events.includes('VIP') && timeLeft > 20 && timeLeft < levelData.time - 15) { if (Math.random() < 0.05) startVipEvent(); } } if (timeLeft <= 0) showEndGame(false); }
         function showEndGame(didWinGame) { clearInterval(gameInterval); resetStreak(); if (didWinGame) { transitionTitle.textContent = "¡Felicidades!"; transitionText.textContent = `¡Has completado todos los niveles! Puntuación Final: ${totalCoins}`; coinsEarnedText.innerHTML = ""; nextLevelBtn.textContent = "Jugar de Nuevo"; soundManager.playLevelUp(); currentLevelIndex = -1; } else { transitionTitle.textContent = "¡Se acabó el tiempo!"; transitionText.textContent = `Nivel ${currentLevelIndex + 1} no superado.`; coinsEarnedText.innerHTML = ""; nextLevelBtn.textContent = "Reintentar Nivel"; soundManager.playGameOver(); } shopBtn.classList.add('hidden'); levelTransitionScreen.classList.remove('hidden'); }
         function completeLevel() { clearInterval(gameInterval); const coinsEarned = levelScore; totalCoins += coinsEarned; soundManager.playLevelUp(); oneTimeBonuses = { time: 0, patience: 0 }; resetStreak(); transitionTitle.textContent = `¡Nivel ${currentLevelIndex + 1} Superado!`; transitionText.textContent = "¡Buen trabajo!"; coinsEarnedText.innerHTML = `Has ganado ${coinsEarned} <svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#facc15"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#a16207">C</text></svg>`; nextLevelBtn.textContent = "Siguiente Nivel"; shopBtn.classList.remove('hidden'); levelTransitionScreen.classList.remove('hidden'); }
         function serveActivePlate() { if (plates[activePlateIndex].isProcessing) return; soundManager.playClick(); const plateToServe = plates[activePlateIndex].ingredients; if (plateToServe.length === 0) { handleIncorrectOrder(); return; } const customer = activeCustomers[activePlateIndex]; if (customer && arraysMatch(plateToServe, customer.order)) { let pointsGained = customer.isVip ? 0 : 1; if (!customer.isVip && customer.order.includes(SPECIAL_INGREDIENT)) pointsGained = 2; streakCounter++; let bonusCoins = 0; if (streakCounter > 0 && streakCounter % STREAK_BONUS_THRESHOLD === 0) { bonusCoins = 5; totalCoins += bonusCoins; soundManager.playStreak(); } levelScore += pointsGained; let coinsGained = customer.isVip ? VIP_REWARD : 0; totalCoins += coinsGained; soundManager.playSuccess(); if(customer.isVip) soundManager.playCoin(); animatePlateDelivery(activePlateIndex, plateToServe, pointsGained + bonusCoins, customer.isVip, bonusCoins > 0); clearActivePlate(); startStreakTimer(); } else { handleIncorrectOrder(); } }
@@ -550,18 +567,39 @@
         function startRushHour() { isRushHourActive = true; rushHourTimer = 15; showEventMessage("¡HORA PICO!"); soundManager.playRushHour(); }
         function endRushHour() { isRushHourActive = false; showEventMessage("Fin de la Hora Pico"); }
         function showEventMessage(message) { const eventDiv = document.createElement('div'); eventDiv.className = 'event-overlay'; eventDiv.textContent = message; gameContainer.appendChild(eventDiv); setTimeout(() => { if(gameContainer.contains(eventDiv)) { gameContainer.removeChild(eventDiv); } }, 2000); }
-        function addIngredient(item) { if (plates[activePlateIndex].isProcessing) return; const ingredientEl = document.querySelector(`.ingredient[data-ingredient="${item}"]`); if (!ingredientEl.classList.contains('available')) return; if (plates[activePlateIndex].ingredients.length >= MAX_INGREDIENTS_PER_PLATE) return; soundManager.playClick(); plates[activePlateIndex].ingredients.push(item); renderAllPlates(); }
+        function addIngredient(item) { if (plates[activePlateIndex].isProcessing) return; const ingredientEl = document.querySelector(`.ingredient[data-ingredient="${item}"]`); if (!ingredientEl || !ingredientEl.classList.contains('available')) return; if (plates[activePlateIndex].ingredients.length >= MAX_INGREDIENTS_PER_PLATE) return; soundManager.playClick(); plates[activePlateIndex].ingredients.push(item); renderAllPlates(); }
         function clearActivePlate() { if (plates[activePlateIndex].isProcessing) return; if (plates[activePlateIndex].ingredients.length > 0) { soundManager.playTrash(); } plates[activePlateIndex].ingredients = []; renderAllPlates(); }
         function selectPlate(index) { if (plates[index].isProcessing) return; soundManager.playClick(); activePlateIndex = index; renderAllPlates(); }
         function renderAllPlates() { plateArea.innerHTML = ''; for (let i = 0; i < NUM_PLATES; i++) { const plateData = plates[i]; const plateEl = document.createElement('div'); plateEl.className = 'plate'; plateEl.id = `plate-${i}`; if (i === activePlateIndex) plateEl.classList.add('active'); if (plateData.isProcessing) plateEl.classList.add('processing'); plateData.ingredients.forEach((item) => { const itemSpan = document.createElement('span'); itemSpan.className = 'plate-item'; itemSpan.textContent = item; itemSpan.style.top = `${Math.random() * 40 + 10}%`; itemSpan.style.left = `${Math.random() * 60 + 15}%`; plateEl.appendChild(itemSpan); }); plateEl.addEventListener('click', () => selectPlate(i)); plateArea.appendChild(plateEl); } updateActionButtons(); }
         
         function updateAvailableIngredients() {
+            bottomStations.innerHTML = '';
             const levelData = LEVELS[currentLevelIndex];
-            document.querySelectorAll('#bottom-stations > div[data-ingredient]').forEach(el => {
-                el.classList.toggle('available', levelData.ingredients.includes(el.dataset.ingredient));
-            });
-            document.querySelectorAll('#bottom-stations > div[data-action]').forEach(el => {
-                el.classList.toggle('available', levelData.actions.includes(el.dataset.action));
+            const availableItems = [...levelData.ingredients, ...levelData.actions];
+            const allPossibleItems = [...ALL_INGREDIENTS, 'chop', 'juice'];
+            
+            allPossibleItems.forEach(item => {
+                const isAction = item === 'chop' || item === 'juice';
+                const el = document.createElement('div');
+                el.dataset[isAction ? 'action' : 'ingredient'] = item;
+                
+                if (isAction) {
+                    el.id = item === 'chop' ? 'chop-station' : 'juice-station';
+                    el.className = 'action-station';
+                    el.innerHTML = `<div class="action-icon">${item === 'chop' ? '🔪' : '🧃'}</div><div class="progress-bar-container"><div id="${item}-progress" class="progress-bar"></div></div>`;
+                     el.addEventListener('click', () => processIngredient(item));
+                } else {
+                    el.className = 'ingredient';
+                    el.innerHTML = `<div class="ingredient-icon">${item}</div>`;
+                    el.addEventListener('click', () => addIngredient(item));
+                }
+
+                if (availableItems.includes(item)) {
+                    el.classList.add('available');
+                } else {
+                    el.classList.add('hidden'); // Hide if not in level
+                }
+                bottomStations.appendChild(el);
             });
         }
 
@@ -570,18 +608,21 @@
         function updateActionButtons() {
             const currentPlate = plates[activePlateIndex];
             const levelData = LEVELS[currentLevelIndex];
-            const canChop = levelData.actions.includes('chop') && currentPlate.ingredients.length === 1 && currentPlate.ingredients[0] === '🥬';
-            chopStation.classList.toggle('usable', canChop);
-            const canJuice = levelData.actions.includes('juice') && currentPlate.ingredients.length === 1 && currentPlate.ingredients[0] === '🍊';
-            juiceStation.classList.toggle('usable', canJuice);
+            
+            const chopStation = document.getElementById('chop-station');
+            const juiceStation = document.getElementById('juice-station');
+
+            if(chopStation) {
+                const canChop = levelData.actions.includes('chop') && currentPlate.ingredients.length === 1 && currentPlate.ingredients[0] === '🥬';
+                chopStation.classList.toggle('usable', canChop);
+            }
+            if(juiceStation){
+                const canJuice = levelData.actions.includes('juice') && currentPlate.ingredients.length === 1 && currentPlate.ingredients[0] === '🍊';
+                juiceStation.classList.toggle('usable', canJuice);
+            }
         }
         
         function setupEventListeners() {
-            document.querySelectorAll('.ingredient').forEach(ing => {
-                ing.addEventListener('click', () => addIngredient(ing.dataset.ingredient));
-            });
-            chopStation.addEventListener('click', () => processIngredient('chop'));
-            juiceStation.addEventListener('click', () => processIngredient('juice'));
             trashBtn.addEventListener('click', clearActivePlate);
             serveBtn.addEventListener('click', serveActivePlate);
             shopBtn.addEventListener('click', showShop);
@@ -603,9 +644,9 @@
         function processIngredient(stationType) {
             const plateToProcess = plates[activePlateIndex];
             if (plateToProcess.isProcessing) return; 
-
-            const stationEl = document.getElementById(stationType === 'chop' ? 'chop-station' : 'juice-station');
-            const progressEl = document.getElementById(stationType === 'chop' ? 'chop-progress' : 'juice-progress');
+            
+            const stationEl = document.getElementById(`${stationType}-station`);
+            const progressEl = document.getElementById(`${stationType}-progress`);
             const ingredientToProcess = stationType === 'chop' ? '🥬' : '🍊';
             const soundToPlay = stationType === 'chop' ? soundManager.playChop : soundManager.playJuice;
             
@@ -614,7 +655,7 @@
             if (!stationEl.classList.contains('available') || !canProcess) return;
             
             plateToProcess.isProcessing = true;
-            renderAllPlates(); // Show processing state immediately
+            renderAllPlates(); 
             soundToPlay();
             
             let progress = 0;
@@ -627,17 +668,17 @@
                     plateToProcess.ingredients[0] = PROCESSED_INGREDIENTS[plateToProcess.ingredients[0]];
                     progressEl.style.width = '0%';
                     plateToProcess.isProcessing = false;
-                    renderAllPlates(); // Update plate with final product
+                    renderAllPlates();
                 }
             }, PROCESS_TIME / 10);
         }
 
         function animatePlateDelivery(customerIndex, plateContent, pointsGained, isVip) { const plateEl = document.getElementById(`plate-${customerIndex}`); const customerEl = document.getElementById(`customer-${customerIndex}`); const containerRect = gameContainer.getBoundingClientRect(); if (!plateEl || !customerEl) return; const startRect = plateEl.getBoundingClientRect(); const endRect = customerEl.getBoundingClientRect(); const flyingPlate = document.createElement('div'); flyingPlate.className = 'flying-plate'; flyingPlate.innerHTML = plateContent.map(item => `<span class="plate-item">${PROCESSED_INGREDIENTS[item] || item}</span>`).join(''); const startX = startRect.left - containerRect.left + (startRect.width / 2) - 40; const startY = startRect.top - containerRect.top + (startRect.height / 2) - 20; const endX = endRect.left - containerRect.left + (endRect.width / 2) - 40; const endY = endRect.top - containerRect.top; flyingPlate.style.left = `${startX}px`; flyingPlate.style.top = `${startY}px`; gameContainer.appendChild(flyingPlate); requestAnimationFrame(() => { flyingPlate.style.left = `${endX}px`; flyingPlate.style.top = `${endY}px`; flyingPlate.style.transform = 'scale(0.5)'; flyingPlate.style.opacity = '0'; }); setTimeout(() => { if(gameContainer.contains(flyingPlate)) { gameContainer.removeChild(flyingPlate); } removeCustomer(customerIndex, true, pointsGained, isVip); }, 500); }
-        function showFloatingScore(customerEl, pointsOrCoins, isVip, bonusCoins) { if (!customerEl) return; const containerRect = gameContainer.getBoundingClientRect(); const customerRect = customerEl.getBoundingClientRect(); const scoreText = document.createElement('div'); scoreText.className = 'floating-score'; let content = ''; if(isVip) { content = `+${pointsOrCoins} <svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#facc15"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#a16207">C</text></svg>`; } else { content = `+${pointsOrCoins}`; } if (bonusCoins > 0) { content += ` +${bonusCoins} <svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#facc15"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#a16207">C</text></svg>`; } scoreText.innerHTML = content; const x = customerRect.left - containerRect.left + (customerRect.width / 2) - 15; const y = customerRect.top - containerRect.top; scoreText.style.left = `${x}px`; scoreText.style.top = `${y}px`; gameContainer.appendChild(scoreText); setTimeout(() => { if(gameContainer.contains(scoreText)) { gameContainer.removeChild(scoreText); } }, 1500); }
+        function showFloatingScore(customerEl, pointsOrCoins, isVip, bonusCoins) { if (!customerEl) return; const containerRect = gameContainer.getBoundingClientRect(); const customerRect = customerEl.getBoundingClientRect(); const scoreText = document.createElement('div'); scoreText.className = 'floating-score'; let content = ''; if(isVip) { content = `+${VIP_REWARD} <svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#facc15"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#a16207">C</text></svg>`; } else { content = `+${pointsOrCoins}`; } if (bonusCoins > 0) { content += ` +${bonusCoins} <svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#facc15"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#a16207">C</text></svg>`; } scoreText.innerHTML = content; const x = customerRect.left - containerRect.left + (customerRect.width / 2) - 15; const y = customerRect.top - containerRect.top; scoreText.style.left = `${x}px`; scoreText.style.top = `${y}px`; gameContainer.appendChild(scoreText); setTimeout(() => { if(gameContainer.contains(scoreText)) { gameContainer.removeChild(scoreText); } }, 1500); }
         function startVipEvent() { if (vipHasSpawnedThisLevel) return; const emptySlot = activeCustomers.findIndex(c => c === null); if (emptySlot === -1) return; vipHasSpawnedThisLevel = true; showEventMessage("¡CLIENTE VIP!"); soundManager.playVip(); spawnCustomer(emptySlot, true); }
         function resetStreak() { clearInterval(streakInterval); streakInterval = null; streakCounter = 0; streakTimer = STREAK_DURATION; updateUI(); }
         function startStreakTimer() { streakTimer = STREAK_DURATION; if (!streakInterval) { streakInterval = setInterval(streakLoop, 100); } }
-        function streakLoop() { streakTimer -= 100; const percentage = (streakTimer / STREAK_DURATION) * 100; if (streakTimerBar) { streakTimerBar.style.width = `${percentage}%`; } if (streakTimer <= 0) { resetStreak(); } }
+        function streakLoop() { streakTimer -= 100; const percentage = (streakTimer / STREAK_DURATION) * 100; const streakTimerBar = document.getElementById('streak-timer-bar'); if (streakTimerBar) { streakTimerBar.style.width = `${percentage}%`; } if (streakTimer <= 0) { resetStreak(); } }
 
         setupEventListeners();
     </script>
