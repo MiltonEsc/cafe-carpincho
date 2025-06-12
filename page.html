@@ -1,14 +1,3 @@
-<!-- Chosen Palette: Warm & Welcoming -->
-<!-- Application Structure Plan: The application is structured as a single-page interactive dashboard with a sticky side navigation. This architecture was chosen over a linear document to allow users (developers, designers, stakeholders) to quickly jump to the information most relevant to them. The key sections are: 1. Overview (a quick summary), 2. Core Mechanics (interactive cards for discoverability), 3. Progression & Levels (an interactive level browser to quickly see difficulty changes), 4. Game Economy (details on currency and the shop), and 5. Events & Systems (for dynamic elements like VIPs and streaks). This non-linear, task-oriented structure prioritizes usability and efficient information retrieval over simply mimicking the GDD's chapter order. Users can explore game rules without scrolling through text, making it a more effective reference tool. -->
-<!-- Visualization & Content Choices: 
-- Report Info: Game progression across 20 levels. -> Goal: Compare/Change. -> Viz/Method: Interactive Line Chart (Chart.js/Canvas). -> Interaction: Hovering over points shows exact data. -> Justification: Provides an immediate visual summary of the difficulty curve, which is more effective than reading a long table.
-- Report Info: Core game mechanics (Pedidos, Procesamiento, Paciencia, etc.). -> Goal: Organize/Inform. -> Viz/Method: Interactive Cards (HTML/CSS/Tailwind). -> Interaction: Clicking a card reveals detailed text. -> Justification: Breaks down complex rules into digestible, self-contained units, reducing cognitive load. Uses Unicode icons for visual cues.
-- Report Info: Detailed level data (goal, time, ingredients). -> Goal: Inform/Explore. -> Viz/Method: Dynamic Text Panel updated by buttons (HTML/JS). -> Interaction: Clicking a level button instantly displays its specific parameters. -> Justification: Allows for rapid comparison and lookup of level data without needing to scroll through a large configuration object in code or a long document.
-- Report Info: Shop upgrades. -> Goal: Inform. -> Viz/Method: Styled Cards (HTML/CSS). -> Interaction: Static display. -> Justification: Clearly presents the items available in the in-game shop in a visually organized manner.
-- Report Info: Core Loop process. -> Goal: Organize. -> Viz/Method: Styled Flowchart (HTML/CSS/Tailwind). -> Interaction: Static display. -> Justification: Visually represents the cyclical nature of the gameplay, making it easier to understand than a numbered list.
--->
-<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
 <!DOCTYPE html>
 <html lang="es" class="scroll-smooth">
 <head>
@@ -72,7 +61,7 @@
     <aside class="sticky top-0 h-screen w-64 bg-white shadow-lg hidden lg:block">
         <div class="p-6">
             <h1 class="title-font text-2xl text-[#A98D71]">Café Carpincho</h1>
-            <p class="text-sm text-gray-500">GDD Interactivo</p>
+            <p class="text-sm text-gray-500">GDD Interactivo v1.2</p>
         </div>
         <nav id="desktop-nav" class="mt-4">
             <a href="#overview" class="nav-link block py-3 px-6 text-gray-600 font-semibold">Visión General</a>
@@ -92,7 +81,7 @@
             <h2 class="title-font text-3xl md:text-4xl text-gray-800 mb-4">Visión General del Juego</h2>
             <div class="card p-6 md:p-8">
                 <p class="text-lg leading-relaxed">
-                    <strong>Café Carpincho</strong> es un juego de gestión de tiempo de estilo arcade. El jugador asume el rol de un carpincho que debe atender a una clientela de animales sirviendo pedidos en un café del bosque. El objetivo es progresar a través de niveles de dificultad creciente, ganar monedas y utilizar mejoras estratégicas para superar los desafíos, todo envuelto en una estética encantadora.
+                    <strong>Café Carpincho</strong> es un juego de gestión de tiempo de estilo arcade. El jugador asume el rol de un carpincho que debe atender a una clientela de animales sirviendo pedidos en un café del bosque. El objetivo es progresar a través de niveles de dificultad creciente, ganar monedas y utilizar mejoras estratégicas para superar los desafíos, todo envuelto en una estética encantadora y diseñado para móviles.
                 </p>
             </div>
         </section>
@@ -102,7 +91,7 @@
             <h2 class="title-font text-3xl md:text-4xl text-gray-800 mb-4">Bucle de Juego Principal</h2>
             <div class="card p-6 md:p-8">
                 <p class="mb-6">El ciclo de juego fundamental se centra en atender clientes de la forma más eficiente posible. Este diagrama ilustra el flujo de acciones que el jugador repite constantemente.</p>
-                <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-center flex-wrap">
                     <div class="p-4 rounded-lg bg-amber-50">Llega Cliente</div>
                     <div class="text-2xl text-amber-500">→</div>
                     <div class="p-4 rounded-lg bg-amber-50">Prepara Pedido</div>
@@ -128,17 +117,17 @@
                 <!-- Tarjeta de Procesamiento -->
                 <div class="card p-6">
                     <h3 class="font-bold text-xl mb-2 flex items-center"><span class="text-3xl mr-3">🔪</span>Procesamiento</h3>
-                    <p class="text-gray-600">Algunos ingredientes requieren un paso extra. El jugador debe usar estaciones (como la tabla de cortar) para transformar ingredientes base en procesados.</p>
+                    <p class="text-gray-600">Algunos ingredientes requieren un paso extra. El jugador debe usar estaciones (tabla de cortar, exprimidor) para transformar ingredientes base en procesados.</p>
                 </div>
                 <!-- Tarjeta de Paciencia -->
                 <div class="card p-6">
                     <h3 class="font-bold text-xl mb-2 flex items-center"><span class="text-3xl mr-3">😠</span>Paciencia y Errores</h3>
-                    <p class="text-gray-600">Cada cliente tiene una barra de paciencia. Los errores al servir o la falta de paciencia agotan el tiempo y rompen las rachas.</p>
+                    <p class="text-gray-600">Cada cliente tiene una barra de paciencia. Los errores al servir o la falta de paciencia agotan el tiempo del nivel y rompen las rachas de combos.</p>
                 </div>
-                 <!-- Tarjeta de Rachas -->
+                <!-- Tarjeta de Rachas -->
                 <div class="card p-6">
                     <h3 class="font-bold text-xl mb-2 flex items-center"><span class="text-3xl mr-3">🔥</span>Sistema de Rachas</h3>
-                    <p class="text-gray-600">Servir platos correctos de forma consecutiva activa una racha que otorga monedas extra. La racha se rompe con el primer error y tiene un límite de tiempo.</p>
+                    <p class="text-gray-600">Servir platos correctos de forma consecutiva activa una racha que otorga monedas extra. Se rompe con el primer error o si se tarda demasiado.</p>
                 </div>
             </div>
         </section>
@@ -147,7 +136,7 @@
         <section id="progression" class="mb-16">
             <h2 class="title-font text-3xl md:text-4xl text-gray-800 mb-4">Progresión y Niveles</h2>
             <div class="card p-6 md:p-8">
-                <p class="mb-4">El juego se estructura en 20 niveles con una curva de dificultad progresiva. Utiliza el explorador de niveles para ver los detalles de cada uno.</p>
+                <p class="mb-4">El juego se estructura en niveles con una curva de dificultad progresiva. Utiliza el explorador de niveles para ver los detalles de cada uno.</p>
                 
                 <div class="mb-6">
                     <h3 class="font-bold text-lg mb-2">Explorador de Niveles</h3>
@@ -156,7 +145,7 @@
                     </div>
                 </div>
 
-                <div id="level-details" class="bg-amber-50 p-6 rounded-lg">
+                <div id="level-details" class="bg-amber-50 p-6 rounded-lg transition-all duration-300">
                     <!-- Los detalles del nivel seleccionado se mostrarán aquí -->
                 </div>
 
@@ -175,11 +164,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="card p-6 border-l-4 border-amber-500">
                     <h3 class="font-bold text-xl mb-2">¡Hora Pico!</h3>
-                    <p class="text-gray-600">Un evento aleatorio de 15 segundos donde los clientes llegan más rápido, pero su paciencia disminuye más lentamente, creando un desafío de alta velocidad y alta recompensa.</p>
+                    <p class="text-gray-600">Un evento aleatorio de 15 segundos donde los clientes llegan más rápido. Una prueba de velocidad y eficiencia para el jugador.</p>
                 </div>
                 <div class="card p-6 border-l-4 border-purple-500">
                     <h3 class="font-bold text-xl mb-2">Cliente VIP 👑</h3>
-                    <p class="text-gray-600">Un cliente especial que aparece una vez por nivel. Tiene un pedido complejo y poca paciencia, pero otorga una gran cantidad de monedas si se le atiende con éxito.</p>
+                    <p class="text-gray-600">Un cliente especial que aparece una vez por nivel. Tiene un pedido complejo y poca paciencia, pero otorga una gran cantidad de monedas.</p>
                 </div>
             </div>
         </section>
@@ -194,7 +183,7 @@
                 </div>
                  <div class="card p-6">
                     <h3 class="font-bold text-xl mb-2">Mejoras Temporales</h3>
-                    <p class="text-gray-600">En la tienda, accesible entre niveles, el jugador puede comprar mejoras como "Zapatillas Rápidas" (más tiempo) o "Café de Calidad" (más paciencia) que se aplican solo al siguiente intento de nivel.</p>
+                    <p class="text-gray-600">En la tienda, accesible entre niveles, el jugador puede comprar mejoras como "Zapatillas Rápidas" (+5s de tiempo) o "Café de Calidad" (+10% de paciencia).</p>
                 </div>
             </div>
         </section>
@@ -206,26 +195,14 @@
             // --- DATOS DEL GDD ---
             const GDD_DATA = {
                 levels: [
-                    { level: 1, goal: 5, time: 100, patience: 100, maxOrderSize: 1, ingredients: ['🍓', '🥬', '🥕'], events: [] },
-                    { level: 2, goal: 7, time: 90, patience: 95, maxOrderSize: 2, ingredients: ['🍓', '🥬', '🥕', '🌽'], events: ['Hora Pico'] },
-                    { level: 3, goal: 10, time: 80, patience: 90, maxOrderSize: 2, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 4, goal: 12, time: 75, patience: 85, maxOrderSize: 3, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 5, goal: 15, time: 70, patience: 80, maxOrderSize: 3, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 6, goal: 18, time: 65, patience: 75, maxOrderSize: 3, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 7, goal: 20, time: 60, patience: 70, maxOrderSize: 4, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 8, goal: 22, time: 60, patience: 70, maxOrderSize: 4, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 9, goal: 25, time: 55, patience: 65, maxOrderSize: 4, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 10, goal: 28, time: 55, patience: 65, maxOrderSize: 4, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 11, goal: 30, time: 50, patience: 60, maxOrderSize: 4, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 12, goal: 32, time: 50, patience: 60, maxOrderSize: 4, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 13, goal: 35, time: 45, patience: 55, maxOrderSize: 5, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 14, goal: 38, time: 45, patience: 55, maxOrderSize: 5, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 15, goal: 40, time: 40, patience: 50, maxOrderSize: 5, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 16, goal: 42, time: 40, patience: 50, maxOrderSize: 5, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 17, goal: 45, time: 35, patience: 45, maxOrderSize: 5, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 18, goal: 48, time: 35, patience: 45, maxOrderSize: 5, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 19, goal: 50, time: 30, patience: 40, maxOrderSize: 5, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] },
-                    { level: 20, goal: 55, time: 30, patience: 40, maxOrderSize: 5, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🔪'], events: ['Hora Pico', 'VIP'] }
+                    { level: 1, goal: 5, time: 100, patience: 100, maxOrderSize: 1, ingredients: ['🍓', '🥬', '🥕'], actions: [], events: [] },
+                    { level: 2, goal: 7, time: 90, patience: 95, maxOrderSize: 2, ingredients: ['🍓', '🥬', '🥕', '🌽'], actions: [], events: ['VIP'] },
+                    { level: 3, goal: 10, time: 80, patience: 90, maxOrderSize: 2, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉'], actions: ['chop'], events: ['Hora Pico', 'VIP'] },
+                    { level: 4, goal: 12, time: 75, patience: 85, maxOrderSize: 3, ingredients: ['🍓', '�', '🥕', '🌽', '🍉', '🌶️'], actions: ['chop'], events: ['Hora Pico', 'VIP'] },
+                    { level: 5, goal: 15, time: 70, patience: 80, maxOrderSize: 3, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️'], actions: ['chop'], events: ['Hora Pico', 'VIP'] },
+                    { level: 6, goal: 20, time: 65, patience: 75, maxOrderSize: 4, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️'], actions: ['chop'], events: ['Hora Pico', 'VIP'] },
+                    { level: 7, goal: 22, time: 60, patience: 70, maxOrderSize: 4, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🍊'], actions: ['chop', 'juice'], events: ['Hora Pico', 'VIP'] },
+                    { level: 8, goal: 25, time: 55, patience: 65, maxOrderSize: 5, ingredients: ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🍊'], actions: ['chop', 'juice'], events: ['Hora Pico', 'VIP'] }
                 ]
             };
 
@@ -256,7 +233,6 @@
                 button.textContent = `Nivel ${level.level}`;
                 button.addEventListener('click', () => {
                     displayLevelDetails(level);
-                    // Resaltar botón activo
                     document.querySelectorAll('#level-selector button').forEach(btn => btn.classList.remove('bg-amber-200', 'border-amber-500'));
                     button.classList.add('bg-amber-200', 'border-amber-500');
                 });
@@ -264,7 +240,8 @@
             });
 
             function displayLevelDetails(level) {
-                let ingredientsHtml = level.ingredients.map(ing => `<span class="tag">${ing}</span>`).join(' ');
+                let allItems = [...level.ingredients, ...level.actions.map(a => a === 'chop' ? '🔪' : '🧃')];
+                let itemsHtml = allItems.map(item => `<span class="tag">${item}</span>`).join(' ');
                 let eventsHtml = level.events.length > 0 
                     ? level.events.map(evt => `<span class="tag">${evt}</span>`).join(' ')
                     : '<span class="text-gray-500">Ninguno</span>';
@@ -286,8 +263,8 @@
                         </div>
                     </div>
                     <div class="mt-4">
-                        <p class="font-semibold mb-2">Ingredientes Disponibles:</p>
-                        <div class="flex flex-wrap gap-2">${ingredientsHtml}</div>
+                        <p class="font-semibold mb-2">Ingredientes y Acciones:</p>
+                        <div class="flex flex-wrap gap-2">${itemsHtml}</div>
                     </div>
                      <div class="mt-4">
                         <p class="font-semibold mb-2">Eventos Posibles:</p>
@@ -296,7 +273,6 @@
                 `;
             }
 
-            // Mostrar detalles del Nivel 1 por defecto
             document.querySelector('#level-selector button').click();
             
             // --- GRÁFICO DE DIFICULTAD ---
@@ -341,22 +317,14 @@
                             type: 'linear',
                             display: true,
                             position: 'left',
-                            title: {
-                                display: true,
-                                text: 'Clientes'
-                            }
+                            title: { display: true, text: 'Clientes' }
                         },
                         y1: {
                             type: 'linear',
                             display: true,
                             position: 'right',
-                            title: {
-                                display: true,
-                                text: 'Segundos'
-                            },
-                            grid: {
-                                drawOnChartArea: false, 
-                            },
+                            title: { display: true, text: 'Segundos' },
+                            grid: { drawOnChartArea: false },
                         },
                     }
                 }
