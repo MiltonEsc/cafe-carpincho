@@ -213,7 +213,6 @@
             width: 100%;
             height: 100%;
         }
-        /* CORREGIDO: CSS para que el SVG se vea en el plato */
         .plate-item .svg-icon {
             height: 1.8em;
             width: 1.8em;
@@ -397,8 +396,9 @@
     </div>
 
     <script>
-        const ALL_INGREDIENTS = ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '�', '🥑', '🍅', '🍄', '🍍', '🥥', '🥝', '🥭', '🍑', '🍒', '🫐', '🍈', '🍐', '🥦', '🥒', '🧅'];
+        const ALL_INGREDIENTS = ['🍓', '🥬', '🥕', '🌽', '🍉', '🌶️', '🍊', '🥑', '🍅', '🍄', '🍍', '🥥', '🥝', '🥭', '🍑', '🍒', '🫐', '🍈', '🍐', '🥦', '🥒', '🧅'];
         
+        // CORREGIDO: Lógica de generación de niveles mejorada
         function generateLevels() {
             const levels = [];
             const baseIngredients = ['🍓', '🥬', '🥕'];
@@ -418,10 +418,17 @@
                 };
                 
                 if (i === 5) availableActions.push('chop');
-                if (i === 10) availableActions.push('juice');
+                if (i === 10) {
+                    availableActions.push('juice');
+                    if (!currentIngredients.includes('🍊')) {
+                        currentIngredients.push('🍊');
+                    }
+                }
                 if (i > 2 && i % 4 === 0 && ALL_INGREDIENTS.length > currentIngredients.length) {
                      const newIngredient = ALL_INGREDIENTS[currentIngredients.length];
-                     if (newIngredient) currentIngredients.push(newIngredient);
+                     if (newIngredient && !currentIngredients.includes(newIngredient)) {
+                        currentIngredients.push(newIngredient);
+                     }
                 }
                 
                 level.ingredients = [...currentIngredients];
@@ -436,7 +443,6 @@
         }
 
         const PROCESSED_INGREDIENTS = { '🥬': 'salad_svg', '🍊': '🧃' };
-        // CORREGIDO: Nuevo SVG para la ensalada
         const SVG_ICONS = {
             'salad_svg': `<svg class="svg-icon" viewBox="0 0 64 64"><path fill="#A3E635" d="M56,32c0,11-9,20-20,20S16,43,16,32c0-2.3,0.4-4.5,1.1-6.6l-8.4-8.4C2.9,20.2,0,25.9,0,32c0,17.7,14.3,32,32,32s32-14.3,32-32c0-6.1-1.7-11.8-4.7-16.9l-8.4,8.4C55.6,27.5,56,29.7,56,32z"/><path fill="#84CC16" d="M50,16c-3.2-3.2-7.4-5-12-5c-4.6,0-8.8,1.8-12,5c-3.2,3.2-5,7.4-5,12c0,4.6,1.8,8.8,5,12c3.2,3.2,7.4,5,12,5s8.8-1.8,12-5c3.2-3.2,5-7.4,5-12C55,23.4,53.2,19.2,50,16z"/><path fill="#DC2626" d="M30,22c-3.3,0-6,2.7-6,6s2.7,6,6,6s6-2.7,6-6S33.3,22,30,22z"/></svg>`
         };
@@ -523,7 +529,7 @@
         function gameLoop() { timeLeft--; updateUI(); updatePatience(); if (isRushHourActive) { rushHourTimer--; if (rushHourTimer <= 0) endRushHour(); } else if (!vipHasSpawnedThisLevel) { const levelData = LEVELS[currentLevelIndex]; if (levelData.events.includes('Hora Pico') && timeLeft > 15 && timeLeft < levelData.time - 20) { if (Math.random() < 0.1) startRushHour(); } if (levelData.events.includes('VIP') && timeLeft > 20 && timeLeft < levelData.time - 15) { if (Math.random() < 0.05) startVipEvent(); } } if (timeLeft <= 0) showEndGame(false); }
         function showEndGame(didWinGame) { clearInterval(gameInterval); resetStreak(); if (didWinGame) { transitionTitle.textContent = "¡Felicidades!"; transitionText.textContent = `¡Has completado todos los niveles! Puntuación Final: ${totalCoins}`; coinsEarnedText.innerHTML = ""; nextLevelBtn.textContent = "Jugar de Nuevo"; soundManager.playLevelUp(); currentLevelIndex = -1; } else { transitionTitle.textContent = "¡Se acabó el tiempo!"; transitionText.textContent = `Nivel ${currentLevelIndex + 1} no superado.`; coinsEarnedText.innerHTML = ""; nextLevelBtn.textContent = "Reintentar Nivel"; soundManager.playGameOver(); } shopBtn.classList.add('hidden'); levelTransitionScreen.classList.remove('hidden'); }
         function completeLevel() { clearInterval(gameInterval); const coinsEarned = levelScore; totalCoins += coinsEarned; soundManager.playLevelUp(); oneTimeBonuses = { time: 0, patience: 0 }; resetStreak(); transitionTitle.textContent = `¡Nivel ${currentLevelIndex + 1} Superado!`; transitionText.textContent = "¡Buen trabajo!"; coinsEarnedText.innerHTML = `Has ganado ${coinsEarned} <svg class="coin-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#facc15"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#a16207">C</text></svg>`; nextLevelBtn.textContent = "Siguiente Nivel"; shopBtn.classList.remove('hidden'); levelTransitionScreen.classList.remove('hidden'); }
-        function serveActivePlate() { if (plates[activePlateIndex].isProcessing) return; soundManager.playClick(); const plateToServe = plates[activePlateIndex].ingredients; if (plateToServe.length === 0) { handleIncorrectOrder(); return; } const customer = activeCustomers[activePlateIndex]; if (customer && arraysMatch(plateToServe, customer.order)) { let pointsGained = customer.isVip ? 0 : 1; if (!customer.isVip && customer.order.includes(SPECIAL_INGREDIENT)) pointsGained = 2; streakCounter++; let bonusCoins = 0; if (streakCounter > 0 && streakCounter % STREAK_BONUS_THRESHOLD === 0) { bonusCoins = 5; totalCoins += bonusCoins; soundManager.playStreak(); } levelScore += pointsGained; let coinsGained = customer.isVip ? VIP_REWARD : 0; totalCoins += coinsGained; soundManager.playSuccess(); if(customer.isVip) soundManager.playCoin(); animatePlateDelivery(activePlateIndex, plateToServe, pointsGained, customer.isVip, bonusCoins); clearActivePlate(); startStreakTimer(); } else { handleIncorrectOrder(); } }
+        function serveActivePlate() { if (plates[activePlateIndex].isProcessing) return; soundManager.playClick(); const plateToServe = plates[activePlateIndex].ingredients; if (plateToServe.length === 0) { handleIncorrectOrder(); return; } const customer = activeCustomers[activePlateIndex]; if (customer && arraysMatch(plateToServe, customer.order)) { let pointsGained = customer.isVip ? 0 : 1; if (!customer.isVip && customer.order.includes(SPECIAL_INGREDIENT)) pointsGained = 2; streakCounter++; let bonusCoins = 0; if (streakCounter >= STREAK_BONUS_THRESHOLD) { bonusCoins = 5; totalCoins += bonusCoins; soundManager.playStreak(); } levelScore += pointsGained; let coinsGained = customer.isVip ? VIP_REWARD : 0; totalCoins += coinsGained; soundManager.playSuccess(); if(customer.isVip) soundManager.playCoin(); animatePlateDelivery(activePlateIndex, plateToServe, pointsGained, customer.isVip, bonusCoins); clearActivePlate(); startStreakTimer(); } else { handleIncorrectOrder(); } }
         function handleIncorrectOrder() { soundManager.playError(); resetStreak(); timeLeft -= 5; timerEl.parentElement.classList.add('time-penalty'); setTimeout(() => { timerEl.parentElement.classList.remove('time-penalty'); }, 500); const customer = activeCustomers[activePlateIndex]; if (customer) { customer.patience -= 15; const patienceBarWrapper = document.querySelector(`#customer-${activePlateIndex} .patience-bar-wrapper`); if (patienceBarWrapper) { patienceBarWrapper.classList.add('animate-shake'); setTimeout(() => { patienceBarWrapper.classList.remove('animate-shake'); }, 500); } } const plateEl = document.getElementById(`plate-${activePlateIndex}`); if (plateEl) { plateEl.classList.add('animate-shake'); setTimeout(() => { clearActivePlate(); }, 500); } else { clearActivePlate(); } }
         function removeCustomer(index, wasServed, pointsOrCoins = 0, isVip = false, bonusCoins = 0) { const customerEl = document.getElementById(`customer-${index}`); if (wasServed && customerEl) { showFloatingScore(customerEl, pointsOrCoins, isVip, bonusCoins); } if(customerEl) customerEl.remove(); if (activeCustomers[index]?.isVip) vipHasSpawnedThisLevel = true; activeCustomers[index] = null; if(wasServed) updateUI(); else { resetStreak(); } if (levelScore >= LEVELS[currentLevelIndex].goal) { completeLevel(); return; } const spawnDelay = isRushHourActive ? 500 : 1500; setTimeout(tryToSpawnCustomer, spawnDelay); }
         function updateUI() { levelScoreEl.textContent = levelScore; totalCoinsEl.textContent = totalCoins; timerEl.textContent = Math.ceil(timeLeft); levelDisplayEl.textContent = LEVELS[currentLevelIndex].level; goalDisplayEl.textContent = LEVELS[currentLevelIndex].goal; if (streakCounter >= 2) { streakDisplay.classList.remove('hidden'); streakCounterEl.textContent = streakCounter; } else { streakDisplay.classList.add('hidden'); } }
@@ -761,7 +767,8 @@
                 content = `+${pointsOrCoins}`;
             }
             
-            if (bonusCoins > 0) {
+            // CORREGIDO: Lógica de la puntuación de racha
+            if (bonusCoins > 0 && !isVip) {
                 content += ` <span class="text-orange-400">+${bonusCoins} 🔥</span>`;
             }
             
